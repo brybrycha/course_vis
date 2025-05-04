@@ -35,7 +35,7 @@ class CanvasEventsView(APIView):
         canvas_base_URL = "https://canvas.ucsd.edu/api/v1"
         endpoint = f"{canvas_base_URL}/calendar_events"
         
-        access_token = "13171~L8K8mUuHkfEr9DGLKzFKNZM9DtzJ9Pa9YQMFHWU4axkkKvCMcDZVVLEYw3Uu7Bwf"
+        access_token = "ENTER_YOUR_ACCESS_TOKEN_HERE"
         
         params = {
             "start_date": request.query_params.get("start_date", None),
