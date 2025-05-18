@@ -1,53 +1,62 @@
-// components/TimeBlock.tsx
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
+const HOUR_HEIGHT = 100;
+const DAY_COLUMN_WIDTH = 70;
+const START_HOUR = 8;
+const date = new Date();
+const datIndex = date.getDay();
+
+const dayMap = {
+  Mon: 0,
+  Tue: 1,
+  Wed: 2,
+  Thu: 3,
+  Fri: 4,
+  M: 0,
+  T: 1,
+  W: 2,
+  Th: 3,
+  F: 4,
+};
+
 type TimeBlockProps = {
-  startHour: number; // 예: 9
-  endHour: number;   // 예: 10.5 (10시 30분)
+  startHour: number;
+  endHour: number;
   subject: string;
-  day: string;
-  color?: string;
+  day: string; // e.g., 'Mon', 'Tue', etc.
+  onPress?: () => void;
 };
 
-const TimeBlock: React.FC<TimeBlockProps> = ({ startHour, endHour, subject, day, color = '#FFA07A' }) => {
-  const top = (startHour - 8) * 60; // 8AM을 기준으로 시작 (60px per hour)
-  const height = (endHour - startHour) * 60;
-  const dayColumn = {
-    Mon : 0,
-    Tue : 1,
-    Wed : 2,
-    Thu : 3,
-    Fri : 4,
-  };
-  const left = dayColumn[day] * 70;
+export default function TimeBlock({ startHour, endHour, subject, day }: TimeBlockProps) {
+  const top = (startHour - START_HOUR) * HOUR_HEIGHT;
+  const height = (endHour - startHour) * HOUR_HEIGHT;
+  const left = dayMap[day] * DAY_COLUMN_WIDTH;
+
   return (
-    <TouchableOpacity
-    style={[styles.block, { top, height, backgroundColor: color }]}
-    onPress={() => alert(`지유님 컴포넌트로 이동`)}
-    activeOpacity={0.8}
-  >
+    <View style={[styles.block, { top, height, left }]}>
       <Text style={styles.text}>{subject}</Text>
-    </TouchableOpacity>
+    </View>
   );
-};
-
+}
 
 const styles = StyleSheet.create({
   block: {
     position: 'absolute',
-    left: 50,
-    right: 250,
+    width: DAY_COLUMN_WIDTH,
+    backgroundColor: '#87CEEB',
     borderRadius: 8,
-    padding: 8,
+    padding: 4,
     justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
   },
   text: {
     color: 'white',
-    fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 12,
+    fontWeight: '600',
     textAlign: 'center',
   },
 });
 
-export default TimeBlock;
+
