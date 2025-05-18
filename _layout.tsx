@@ -1,125 +1,159 @@
-import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
 import TimeBlock from '@/components/ui/TimeBlock';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 
+const days = ['M', 'T', 'W', 'Th', 'F'];
+const times = Array.from({ length: 14 }, (_, i) => `${String(i + 8).padStart(2)}`);
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
 
+export default function HomeScreen() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
-}
-
-export default function ScheduleScreen() {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-
-  return (
-    <ScrollView horizontal>
-      <View>
-        {/* 요일 헤더 */}
-        <View style={styles.dayHeaderRow}>
-          <View style={styles.timeLabelCell} /> {/* 비어있는 시간 라벨 칸 */}
-          {days.map((day, idx) => (
-            <View key={idx} style={styles.dayCell}>
+    <View style={styles.container}>
+      <View style={styles.gridContainer}>
+        <View style={styles.headerRow}>
+          <View style={styles.emptyCorner} />
+          {days.map((day) => (
+            <View key={day} style={styles.dayBox}>
               <Text style={styles.dayText}>{day}</Text>
             </View>
           ))}
         </View>
-
-        <View style={styles.scheduleBody}>
-          {/* 시간 라벨 (8AM~5PM) */}
-          <View style={styles.timeColumn}>
-            {Array.from({ length: 15 }, (_, i) => (
-              <View key={i} style={styles.timeRow}>
-                <Text>{`${8 + i}:00`}</Text>
+  
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.timeLine}>
+            <View style={styles.timeColumn}>
+              {times.map((time) => (
+                <View key={time} style={styles.timeBox}>
+                  <Text style={styles.timeText}>{time}</Text>
+                </View>
+              ))}
+              <View style={styles.timeBoxLast}>
+                <Text style={styles.timeText}>22</Text>
+              </View>
+            </View>
+  
+            {days.map((day) => (
+              <View key={day} style={styles.dayColumn}>
+                {times.map((time) => (
+                  <View key={time} style={styles.timeBox} />
+                ))}
+                <View style={styles.timeBoxLast} />
               </View>
             ))}
+  
+            <View style={styles.blocksWrapper}>
+              <TimeBlock startHour={9} endHour={10.5} subject="Econ 100A" day="Mon" />
+              <TimeBlock startHour={13} endHour={14} subject="DSC 10" day="Wed" />
+            </View>
           </View>
-
-          {/* 과목 블록 (TimeBlock들) */}
-          <View style={styles.blocksWrapper}>
-            <TimeBlock startHour={9} endHour={10.5} subject="Econ 100A" day="Mon" />
-            <TimeBlock startHour={13} endHour={14} subject="DSC 10" day="Wed" />
-            {/* 추가 TimeBlock들 */}
-          </View>
-        </View>
-      </View>
-    </ScrollView>
+        </ScrollView>
+      </View> {/* ✅ This now closes gridContainer properly */}
+    </View>
   );
 }
-
 const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
-    paddingTop: 20,
+    backgroundColor: '#fff',
+    paddingTop: 60,
   },
-  dayHeaderRow: {
-    flexDirection: 'row',
-    marginBottom: 5,
-    marginLeft: 50,
-    marginTop: 55, // time label column offset
-  },
-  dayCell: {
-    width: 50,
-    alignItems: 'center',
-  },
-  dayText: {
+
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    fontSize: 16,
+    marginBottom: 15,
+    paddingHorizontal: 20,
   },
-  timeLabelCell: {
-    width: 50,
+
+  gridContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: '#c5d1e5',
+    borderRadius: 24,
+    overflow: 'hidden',
   },
-  scheduleBody: {
+
+  headerRow: {
     flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#c5d1e5',
+    backgroundColor: '#f8f9fa',
   },
-  timeColumn: {
-    width: 50,
+
+  emptyCorner: {
+    width: 30,
+    borderRightWidth : 1,
+    borderColor: '#c5d1e5',
   },
-  timeRow: {
-    height: 60,
-    marginLeft: 5,
-    justifyContent: 'center',
+
+  dayBox: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderRightWidth: 1,
+    borderColor: '#c5d1e5',
   },
-  blocksWrapper: {
+
+  dayText: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
+
+  timeLine: {
+    flexDirection: 'row',
+    flex: 1,
     position: 'relative',
-    width: 70 * 5,
   },
+
+  timeColumn: {
+    width: 30,
+    borderRightWidth: 1,
+    borderColor: '#c5d1e5',
+  },
+
+  dayColumn: {
+    flex: 1,
+    borderRightWidth: 1,
+    borderColor: '#c5d1e5',
+  },
+
+  timeBox: {
+    height: 100,
+    alignItems: 'flex-end',
+    borderBottomWidth : 1,
+    borderColor : '#c5d1e5',
+    paddingTop: 10,
+    paddingRight: 5,
+  },
+
+  timeBoxLast: {
+    height: 100,
+    alignItems: 'flex-end',
+    paddingTop: 10,
+    paddingRight: 5,
+    borderBottomWidth: 1,
+    borderColor: '#c5d1e5',
+  },
+
+  timeText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+
+  blocksWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 33, // 타임라인 시간 텍스트 칼럼 너비만큼 밀기
+    width: '100%',
+    height: '100%',
+    zIndex: 10, // 격자보다 위에
+  }
 });
