@@ -1,0 +1,36 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from .models import React
+from .serializer import ReactSerializer
+from django.db.models import Q
+
+
+class ReactView(APIView):
+    serializer_class = ReactSerializer
+
+    def get(self, request):
+        search_query = request.GET.get('search', '').strip()
+
+        # Get all objects and optionally filter by search term
+        queryset = React.objects.all().order_by("id")
+        if search_query:
+            queryset = queryset.filter(
+                Q(detail__icontains=search_query) |
+                Q(name__icontains=search_query)
+            )
+
+        # Paginate results
+        paginator = PageNumberPagination()
+        paginator.page_size = 50  # Default page size
+        paginator.page_size_query_param = 'page_size'  # Optional override via query param
+
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        serializer = ReactSerializer(paginated_queryset, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    def post(self, request):
+        serializer = ReactSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, TextInput, Button } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TextInput, Button, ActivityIndicator } from "react-native";
 import axios from "axios";
 
 type Quote = {
@@ -12,32 +12,36 @@ export default function Index() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const fetchData = (query: string = "") => {
+  const fetchData = async (query: string = "") => {
     setLoading(true);
 
-    const url = query
-      ? `http://100.83.52.158:8000/wel/?search=${encodeURIComponent(query)}`
-      : "http://100.83.52.158:8000/wel/";
+    try {
+      const baseURL = "https://course-vis.onrender.com/api/data/";
+      const url = query ? `${baseURL}?search=${encodeURIComponent(query)}` : baseURL;
 
-    axios
-      .get(url)
-      .then((res) => {
-        console.log("Fetched data:", res.data);
-        setQuotes(res.data.results || res.data); // fallback for non-paginated
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log("Fetch error:", err.message);
-        setLoading(false);
-      });
+      const response = await axios.get(url);
+      const data = response.data;
+
+      setQuotes(data.results || data); // support paginated or full results
+    } catch (error) {
+  if (axios.isAxiosError(error)) {
+    console.error("Axios error:", error.message);
+  } else if (error instanceof Error) {
+    console.error("Unknown error:", error.message);
+  } else {
+    console.error("An unexpected error occurred", error);
+  }
+} finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(); // fetch initial data
   }, []);
 
   const handleSearch = () => {
-    fetchData(searchTerm);
+    fetchData(searchTerm.trim());
   };
 
   return (
@@ -46,7 +50,7 @@ export default function Index() {
 
       <View style={styles.searchContainer}>
         <TextInput
-          placeholder="Search course name..."
+          placeholder="Search course name or professor..."
           style={styles.input}
           value={searchTerm}
           onChangeText={setSearchTerm}
@@ -54,9 +58,11 @@ export default function Index() {
         <Button title="Search" onPress={handleSearch} />
       </View>
 
-      <Text style={styles.count}>
-        {loading ? "Loading..." : `Total Courses: ${quotes.length}`}
-      </Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <Text style={styles.count}>Total Courses: {quotes.length}</Text>
+      )}
 
       {quotes.map((q, index) => (
         <View key={index} style={styles.card}>
@@ -78,6 +84,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  searchContainer: {
+    flexDirection: "row",
+    marginBottom: 15,
+    gap: 10,
+    alignItems: "center",
+  },
+  input: {
+    flex: 1,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: "#fff",
+  },
   count: {
     marginBottom: 15,
     color: "gray",
@@ -95,20 +116,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     color: "gray",
-  },
-  searchContainer: {
-    flexDirection: "row",
-    marginBottom: 15,
-    gap: 10,
-    alignItems: "center",
-  },
-  input: {
-    flex: 1,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: "#fff",
   },
 });

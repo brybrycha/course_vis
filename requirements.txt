@@ -4,8 +4,16 @@ dj-database-url==2.3.0
 Django==4.2.20
 django-cors-headers==4.7.0
 djangorestframework==3.16.0
+<<<<<<< HEAD
+=======
+gunicorn==23.0.0
+packaging==25.0
+>>>>>>> 04d44df (new)
 psycopg2-binary==2.9.10
 sqlparse==0.5.3
 typing_extensions==4.13.2
 whitenoise==6.9.0
+<<<<<<< HEAD
 gunicorn==23.0.0
+=======
+>>>>>>> 04d44df (new)
