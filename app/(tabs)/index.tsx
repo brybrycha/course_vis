@@ -16,8 +16,8 @@ export default function Index() {
     setLoading(true);
 
     const url = query
-      ? `http://100.83.51.93:8000/wel/?search=${encodeURIComponent(query)}`
-      : "http://100.83.51.93:8000/wel/";
+      ? `http://100.83.52.158:8000/wel/?search=${encodeURIComponent(query)}`
+      : "http://100.83.52.158:8000/wel/";
 
     axios
       .get(url)
