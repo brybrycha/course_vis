@@ -7,41 +7,40 @@ type Quote = {
   detail: string;
 };
 
+const baseURL = "https://course-vis.onrender.com/wel/";
+
 export default function Index() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const fetchData = async (query: string = "") => {
+  const fetchCourses = async (query: string = "") => {
     setLoading(true);
-
     try {
-      const baseURL = "https://course-vis.onrender.com/api/data/";
       const url = query ? `${baseURL}?search=${encodeURIComponent(query)}` : baseURL;
-
       const response = await axios.get(url);
       const data = response.data;
-
-      setQuotes(data.results || data); // support paginated or full results
+      setQuotes(data.results || []);
     } catch (error) {
-  if (axios.isAxiosError(error)) {
-    console.error("Axios error:", error.message);
-  } else if (error instanceof Error) {
-    console.error("Unknown error:", error.message);
-  } else {
-    console.error("An unexpected error occurred", error);
-  }
-} finally {
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.message);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData(); // fetch initial data
+    // Optional: fetch default data on mount
+    // fetchCourses();
   }, []);
 
   const handleSearch = () => {
-    fetchData(searchTerm.trim());
+    if (searchTerm.trim()) {
+      fetchCourses(searchTerm.trim());
+    }
   };
 
   return (
