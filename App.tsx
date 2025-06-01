@@ -1,8 +1,6 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons'; 
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
 
@@ -15,31 +13,12 @@ export default function App() {
                 <Stack.Screen 
                     name="Home" 
                     component={HomeScreen} 
-                    options = {({ navigation }) => ({
-                        headerTitle: () => (
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', paddingLeft: 10 }}>
-                                SP25
-                            </Text>
-                        ),
-                        headerRight: () => (
-                            <Ionicons
-                                name="add-outline"
-                                size={25}
-                                style={{ paddingRight : 0, marginTop : -5}}
-                                onPress={() => navigation.navigate('Search')} 
-                            />   
-                        ),
-                        headerStyle: {
-                            backgroundColor : 'white',
-                            elevation : 0,
-                            shadowColor : 'transparent',      
-                        },
-                        })}
+                    options = {{ headerShown : false }}
                 />
                 <Stack.Screen 
                     name="Search" 
                     component={SearchScreen} 
-                    options={{ title : 'Courses' }}
+                    options={{ headerShown : false}}
                 />
             </Stack.Navigator> 
         </NavigationContainer>
