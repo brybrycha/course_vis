@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import ical from 'ical';
 import { formatInTimeZone } from 'date-fns-tz';
+import fs from 'fs';
 
 const ICS_URL = 'https://canvas.ucsd.edu/feeds/calendars/user_H0VROqlmlxzHT8Ei1Jt0JJubFmNFEuLfTtYryGj2.ics';
 
@@ -32,6 +33,7 @@ async function fetchAndParseICS() {
       }));
 
     console.log('Parsed Events:', parsedEvents);
+    fs.writeFileSync('parsed_events.json', JSON.stringify(parsedEvents, null, 2));
     return parsedEvents;
   } catch (error) {
     console.error('Error:', error.message);

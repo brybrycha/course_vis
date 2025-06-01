@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from core.views import ReactView
+from core.views import ReactView, CalendarEventsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('wel/', ReactView.as_view(), name="something"), 
+    path('calendar-events/', CalendarEventsView.as_view(), name='calendar-events'),
 ]

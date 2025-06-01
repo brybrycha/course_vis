@@ -2,19 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
 import axios from 'axios';
 
+interface CalendarEvent {
+  starttime: string;
+  endtime: string;
+  title: string;
+  className: string;
+}
+
 export default function App() {
   const [details, setDetails] = useState([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [user, setUser] = useState('');
   const [quote, setQuote] = useState('');
 
   useEffect(() => {
     fetchQuotes();
+    fetchCalendarEvents();
   }, []);
 
   const fetchQuotes = () => {
-    axios.get('http://localhost:8000/wel/')  // Replace with LAN IP when using physical device
+    axios.get('http://100.64.20.49:8000/wel/')  // Replace with LAN IP when using physical device
       .then(res => setDetails(res.data))
       .catch(err => console.log(err));
+  };
+
+  const fetchCalendarEvents = () => {
+    axios.get('http://100.64.20.49:8000/calendar-events/')
+      .then(res => setEvents(res.data))
+      .catch(err => console.log('Calendar error:', err));
   };
 
   const handleSubmit = () => {
@@ -32,6 +47,17 @@ export default function App() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      
+      <Text style={styles.title}>Calendar Events</Text>
+      {events.map((event, idx) => (
+        <View key={idx} style={styles.eventCard}>
+          <Text style={styles.eventTitle}>{event.title}</Text>
+          <Text style={styles.eventTime}>Start: {event.starttime}</Text>
+          <Text style={styles.eventTime}>End: {event.endtime}</Text>
+          <Text style={styles.className}>{event.className}</Text>
+        </View>
+      ))}
+        
       <Text style={styles.title}>Submit a Quote</Text>
 
       <TextInput
@@ -97,5 +123,24 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'right',
     fontWeight: '600',
+  },
+  eventCard: {
+    backgroundColor: '#f0f0f0',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  eventTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  eventTime: {
+    marginTop: 4,
+    color: '#666',
+  },
+  className: {
+    marginTop: 8,
+    fontWeight: '600',
+    color: '#0a7ea4',
   },
 });
