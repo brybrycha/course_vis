@@ -1,12 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, ScrollView, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { RootStackParamList, Course } from '../types/navigation';
+import TimeBlock from './timeblock';
 
 const days = ['M', 'T', 'W', 'Th', 'F'];
 const times = Array.from({ length: 14 }, (_, i) => `${String(i + 8).padStart(2)}`);
 
+
+
+
 export default function HomeScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'Home'>>();
+  const course: Course | undefined = route.params?.course;
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  useEffect(() => {
+    if (course && !courses.some((c) => c.subject == course.subject)) {
+      setCourses((prev) => [
+        ...prev, 
+        {
+          subject : course.subject,
+          startHour : course.startHour,
+          endHour : course.endHour,
+          day : course.day,
+        },
+      ]);
+    }
+  }, [course]);
+
   return (
     <View style={styles.container}>
+
+        <View style={styles.header}>
+          <Text style={styles.title}>SP25</Text>
+
+          <Ionicons 
+            name="add-outline" 
+            size={25} 
+            style={styles.addIcon}
+            onPress={() => navigation.navigate('Search')}
+          />
+      </View>
+
       <View style={styles.gridContainer}>
         <View style={styles.headerRow}>
           <View style={styles.emptyCorner} />
@@ -43,6 +83,15 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
+          {courses.map((course, index) => (
+            <TimeBlock
+            key={index}
+            startHour={course.startHour}
+            endHour={course.endHour}
+            subject={course.subject}
+            day={course.day}
+            />
+            ))}
         </ScrollView>
       </View>
     </View>
@@ -57,11 +106,23 @@ const styles = StyleSheet.create({
     paddingTop: 60,
   },
 
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 0,
+    paddingHorizontal: 10,
+  },
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 15,
-    paddingHorizontal: 20,
+    marginBottom: 0,
+    paddingHorizontal: 10,
+  },
+
+  addIcon: {
+    padding: 5,
   },
 
   gridContainer: {
@@ -103,6 +164,7 @@ const styles = StyleSheet.create({
   timeLine: {
     flexDirection: 'row',
     flex: 1,
+    position: 'relative',
   },
 
   timeColumn: {
